@@ -33,23 +33,17 @@ class Manage
                 self::lock();
                 // Handle request
                 if ($action === "import") {
-                    if (isset($parameters->files) && is_array($parameters->files)) {
-                        foreach ($parameters->files as $file) {
+                    if (isset($parameters->files) && is_object($parameters->files)) {
+                        foreach ($parameters->files as $file => $base64) {
                             // Make sure we got an object with the properties
-                            if (is_object($file)) {
-                                if (isset($file->name) && isset($file->contents)) {
-                                    if (is_string($file->name) && is_string($file->contents)) {
-                                        // Create the full path
-                                        $path = self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $file->name;
-                                        // Simplify the path
-                                        $path = realpath($path);
-                                        // Make sure the path is a sub-path to CONTENTS_DIRECTORY
-                                        if (strpos($path, self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR) === 0) {
-                                            // Copy the contents
-                                            file_put_contents($path, $file->contents);
-                                        }
-                                    }
-                                }
+                            // Create the full path
+                            $path = self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $file;
+                            // Simplify the path
+                            $path = realpath($path);
+                            // Make sure the path is a sub-path to CONTENTS_DIRECTORY
+                            if (strpos($path, self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR) === 0) {
+                                // Copy the contents
+                                file_put_contents($path, base64_decode(end(explode(",", $base64))));
                             }
                         }
                         return [true, null];
@@ -59,7 +53,7 @@ class Manage
                     // Try to archive
                     try {
                         // Create a temporary file name
-                        $file = self::temporary("export_", ".tar.gz");
+                        $file = self::temporary(".tar.gz");
                         // Initialize the archive
                         $archive = new PharData($file, null, null, Phar::GZ);
                         // Add the whole directory
@@ -151,13 +145,12 @@ class Manage
 
     /**
      * Creates a path for a temporary file.
-     * @param string $prefix Path prefix
      * @param string $postfix Path postfix
      * @return string Path
      */
-    private static function temporary($prefix = "temporary_", $postfix = "")
+    private static function temporary($postfix = "")
     {
-        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . $prefix . self::random(10) . $postfix;
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . "temporary_" . self::random(10) . $postfix;
     }
 
     /**
