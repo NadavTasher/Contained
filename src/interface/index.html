@@ -27,7 +27,7 @@
 </head>
 <body onload="App.prepare(()=>Authenticate.authentication(load))" column>
 <div id="authenticate" column>
-    <p header>Welcome to Manage</p>
+    <p header>Contained Manager</p>
     <p id="authenticate-output" footer>Please authenticate to continue.</p>
     <div id="authenticate-inputs" column>
         <input id="authenticate-name" type="text" placeholder="Name"/>
@@ -39,17 +39,14 @@
     </div>
 </div>
 <div id="authenticated" content>
-    <div id="home" column>
-        <p header>Manage deployment</p>
-        <p footer>Change deployment settings here.</p>
-        <button>Manage files</button>
-        <button>Open a PHP shell</button>
-    </div>
+    <p header>Contained Manager</p>
+    <p footer>Manage files here.</p>
     <div id="files" column>
-
+        <p footer>Loading your files...</p>
     </div>
-    <div id="shell" column>
-
+    <div row>
+        <button>Import files</button>
+        <button onclick="manage_export();">Export files</button>
     </div>
 </div>
 </body>
