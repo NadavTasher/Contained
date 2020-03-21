@@ -59,14 +59,11 @@ class Manage
                     // Try to archive
                     try {
                         // Create a temporary file name
-                        $file = self::temporary("export_", ".tar");
-                        $file = "file.tar";
+                        $file = self::temporary("export_", ".tar.gz");
                         // Initialize the archive
-                        $archive = new PharData($file);
+                        $archive = new PharData($file, null, null, Phar::GZ);
                         // Add the whole directory
                         $archive->buildFromDirectory(self::CONTENTS_DIRECTORY);
-                        // Build archive
-                        $archive->compress(Phar::NONE);
                         // Return a base64 representation
                         return [true, base64_encode(file_get_contents($file))];
                     } catch (Exception $exception) {

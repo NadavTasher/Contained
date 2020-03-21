@@ -9,8 +9,10 @@ function manage_load_tree(directory) {
 function manage_export() {
     API.send("manage", "export", {}, (success, result) => {
         if (success) {
-            let url = "data:application/tar;base64," + result;
-            window.open(url, "_blank").focus();
+            let link = document.createElement("a");
+            link.href = "data:application/gzip;base64," + result;
+            link.download = "Export.tar.gz";
+            link.click();
         } else {
             alert(result);
         }
