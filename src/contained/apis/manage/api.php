@@ -42,8 +42,12 @@ class Manage
                             $path = realpath($path);
                             // Make sure the path is a sub-path to CONTENTS_DIRECTORY
                             if (strpos($path, self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR) === 0) {
+                                // Parse contents
+                                $contents = end(explode(",", $base64));
+                                // Decode contents
+                                $decoded = base64_decode($contents);
                                 // Copy the contents
-                                file_put_contents($path, base64_decode(end(explode(",", $base64))));
+                                file_put_contents($path, $decoded);
                             }
                         }
                         return [true, null];
