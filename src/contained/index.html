@@ -41,12 +41,14 @@
 <div id="authenticated" content>
     <p header>Contained Manager</p>
     <p footer>Manage files here.</p>
-    <div id="files" column>
-        <p footer>Loading your files...</p>
+    <div column>
+        <datalist id="paths"></datalist>
+        <input id="remove" placeholder="File path" list="paths"/>
+        <button onclick="manage_remove();">Remove path</button>
     </div>
     <div row>
-        <button onclick="manage_import();">Import</button>
-        <button onclick="manage_export();">Export</button>
+        <button onclick="manage_import();">Import all</button>
+        <button onclick="manage_export();">Export all</button>
     </div>
 </div>
 </body>

@@ -69,26 +69,21 @@ class Manage
                         return [false, "Archive creation failure: " . $exception];
                     }
                 } else if ($action === "list") {
-                    return [true, self::tree(self::CONTENTS_DIRECTORY)];
+                    return [true, self::list()];
                 } else if ($action === "remove") {
-                    if (isset($parameters->files) && is_array($parameters->files)) {
-                        foreach ($parameters->files as $file) {
-                            // Make sure we got a string
-                            if (is_string($file)) {
-                                // Create the full path
-                                $path = self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $file;
-                                // Simplify the path
-                                $path = realpath($path);
-                                // Make sure the path is a sub-path to CONTENTS_DIRECTORY
-                                if (strpos($path, self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR) === 0) {
-                                    // Remove the path
-                                    self::remove($path);
-                                }
-                            }
+                    if (isset($parameters->file) && is_string($parameters->file)) {
+                        // Create the full path
+                        $contents = realpath(self::CONTENTS_DIRECTORY);
+                        // Compile path
+                        $path = realpath($contents . $parameters->file);
+                        // Make sure the path is a sub-path to CONTENTS_DIRECTORY
+                        if (strpos($path, $contents) === 0) {
+                            // Remove the path
+                            self::remove($path);
                         }
                         return [true, null];
                     }
-                    return [false, "Invalid 'files' parameter"];
+                    return [false, "Invalid 'file' parameter"];
                 }
             }
             return [false, "Authentication failure"];
@@ -101,16 +96,14 @@ class Manage
      */
     private static function remove($path)
     {
-        if (is_file($path)) {
-            unlink($path);
-        } else {
-            if (is_dir($path)) {
-                foreach (scandir($path) as $entry) {
-                    if ($entry !== "." && $entry !== "..") {
-                        self::remove($path . DIRECTORY_SEPARATOR . $entry);
-                    }
-                }
-                rmdir($path);
+        // List array
+        $array = self::list($path);
+        // Remove files
+        foreach ($array as $path) {
+            if ($path[strlen($path) - 1] === DIRECTORY_SEPARATOR) {
+                rmdir(self::CONTENTS_DIRECTORY . $path);
+            } else {
+                unlink(self::CONTENTS_DIRECTORY . $path);
             }
         }
     }
@@ -118,20 +111,23 @@ class Manage
     /**
      * Creates a path tree.
      * @param string $path Path
-     * @return stdClass | null Tree
+     * @param array $array Current tree
+     * @return array | null List
      */
-    private static function tree($path)
+    private static function list($path = DIRECTORY_SEPARATOR, $array = [])
     {
-        if (is_dir($path)) {
-            $tree = new stdClass();
-            foreach (scandir($path) as $entry) {
+        $realPath = self::CONTENTS_DIRECTORY . $path;
+        if (is_dir($realPath)) {
+            foreach (scandir($realPath) as $entry) {
                 if ($entry !== "." && $entry !== "..") {
-                    $tree->$entry = self::tree($path . DIRECTORY_SEPARATOR . $entry);
+                    $array = self::list($path . $entry, $array);
                 }
             }
-            return $tree;
+            array_push($array, $path . DIRECTORY_SEPARATOR);
+        } else {
+            array_push($array, $path);
         }
-        return null;
+        return $array;
     }
 
     /**
