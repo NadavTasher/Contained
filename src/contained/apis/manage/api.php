@@ -72,15 +72,7 @@ class Manage
                     return [true, self::list()];
                 } else if ($action === "remove") {
                     if (isset($parameters->file) && is_string($parameters->file)) {
-                        // Create the full path
-                        $contents = realpath(self::CONTENTS_DIRECTORY);
-                        // Compile path
-                        $path = realpath($contents . $parameters->file);
-                        // Make sure the path is a sub-path to CONTENTS_DIRECTORY
-                        if (strpos($path, $contents) === 0) {
-                            // Remove the path
-                            self::remove($path);
-                        }
+                        self::remove($parameters->file);
                         return [true, null];
                     }
                     return [false, "Invalid 'file' parameter"];
@@ -92,40 +84,42 @@ class Manage
 
     /**
      * Removes a path.
-     * @param string $path Path
+     * @param string $relativePath Path
      */
-    private static function remove($path)
+    private static function remove($relativePath)
     {
         // List array
-        $array = self::list($path);
+        $array = self::list($relativePath);
         // Remove files
-        foreach ($array as $path) {
-            if ($path[strlen($path) - 1] === DIRECTORY_SEPARATOR) {
-                rmdir(self::CONTENTS_DIRECTORY . $path);
+        foreach ($array as $relativePath) {
+            if ($relativePath[strlen($relativePath) - 1] === DIRECTORY_SEPARATOR) {
+                rmdir(self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $relativePath);
             } else {
-                unlink(self::CONTENTS_DIRECTORY . $path);
+                unlink(self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $relativePath);
             }
         }
     }
 
     /**
      * Creates a path tree.
-     * @param string $path Path
+     * @param string $relativePath Path
      * @param array $array Current tree
      * @return array | null List
      */
-    private static function list($path = DIRECTORY_SEPARATOR, $array = [])
+    private static function list($relativePath = ("."), $array = [])
     {
-        $realPath = self::CONTENTS_DIRECTORY . $path;
-        if (is_dir($realPath)) {
-            foreach (scandir($realPath) as $entry) {
-                if ($entry !== "." && $entry !== "..") {
-                    $array = self::list($path . $entry, $array);
+        $contentsPath = realpath(self::CONTENTS_DIRECTORY);
+        $absolutePath = realpath($contentsPath . DIRECTORY_SEPARATOR . $relativePath);
+        if (strpos($absolutePath, $contentsPath) === 0) {
+            if (is_dir($absolutePath)) {
+                $relativePath .= DIRECTORY_SEPARATOR;
+                foreach (scandir($absolutePath) as $entry) {
+                    if ($entry !== "." && $entry !== "..") {
+                        $array = self::list($relativePath . $entry, $array);
+                    }
                 }
             }
-            array_push($array, $path . DIRECTORY_SEPARATOR);
-        } else {
-            array_push($array, $path);
+            array_push($array, $relativePath);
         }
         return $array;
     }
