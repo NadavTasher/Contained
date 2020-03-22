@@ -33,33 +33,34 @@ class Manage
                 self::lock();
                 // Handle request
                 if ($action === "import") {
-                    if (isset($parameters->files) && is_object($parameters->files)) {
-                        foreach ($parameters->files as $file => $base64) {
-                            // Make sure we got an object with the properties
-                            // Create the full path
-                            $path = self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $file;
-                            // Simplify the path
-                            $path = realpath($path);
-                            // Make sure the path is a sub-path to CONTENTS_DIRECTORY
-                            if (strpos($path, self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR) === 0) {
-                                // Parse contents
-                                $contents = end(explode(",", $base64));
-                                // Decode contents
-                                $decoded = base64_decode($contents);
-                                // Copy the contents
-                                file_put_contents($path, $decoded);
-                            }
+                    if (isset($parameters->file) && is_string($parameters->file)) {
+                        $contents = $parameters->file;
+                        // Decode contents
+                        $decoded = base64_decode($contents);
+                        // Try to archive
+                        try {
+                            // Create a temporary file name
+                            $file = self::temporary(".zip");
+                            // Write file
+                            file_put_contents($file, $decoded);
+                            // Initialize the archive
+                            $archive = new PharData($file, null, null, Phar::ZIP);
+                            // Extract to contents
+                            $archive->extractTo(self::CONTENTS_DIRECTORY);
+                            // Return a base64 representation
+                            return [true, null];
+                        } catch (Exception $exception) {
+                            return [false, "Archive extraction failure: " . $exception];
                         }
-                        return [true, null];
                     }
                     return [false, "Invalid 'files' parameter"];
                 } else if ($action === "export") {
                     // Try to archive
                     try {
                         // Create a temporary file name
-                        $file = self::temporary(".tar.gz");
+                        $file = self::temporary(".zip");
                         // Initialize the archive
-                        $archive = new PharData($file, null, null, Phar::GZ);
+                        $archive = new PharData($file, null, null, Phar::ZIP);
                         // Add the whole directory
                         $archive->buildFromDirectory(self::CONTENTS_DIRECTORY);
                         // Return a base64 representation

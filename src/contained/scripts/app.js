@@ -17,15 +17,11 @@ function manage_load_base64(file) {
 function manage_import() {
     let dialog = document.createElement("input");
     dialog.type = "file";
-    dialog.multiple = true;
-    dialog.directory = true;
-    dialog.webkitdirectory = true;
+    dialog.accept = ".zip";
     dialog.addEventListener("change", async () => {
-        let files = {};
-        for (let file of dialog.files) {
-            files[file.webkitRelativePath] = await manage_load_base64(file);
-        }
-        API.send("manage", "import", {files: files}, (success, result) => {
+        API.send("manage", "import", {
+            file: (await manage_load_base64(dialog.files[0])).split(",").pop()
+        }, (success, result) => {
             if (success) {
                 window.location.reload();
             } else {
@@ -41,7 +37,7 @@ function manage_export() {
         if (success) {
             let link = document.createElement("a");
             link.href = "data:application/gzip;base64," + result;
-            link.download = "Export.tar.gz";
+            link.download = "Export.zip";
             link.click();
         } else {
             alert(result);
