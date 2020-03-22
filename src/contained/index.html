@@ -27,8 +27,8 @@
 </head>
 <body onload="App.prepare(()=>Authenticate.authentication(load))" column>
 <div id="authenticate" column>
-    <p header>Contained Manager</p>
-    <p id="authenticate-output" footer>Please authenticate to continue.</p>
+    <p style="font-size: 5vh;">Welcome to Contained</p>
+    <p style="font-size: 3vh;" id="authenticate-output">Please authenticate to continue.</p>
     <div id="authenticate-inputs" column>
         <input id="authenticate-name" type="text" placeholder="Name"/>
         <input id="authenticate-password" type="password" placeholder="Password"/>
@@ -39,8 +39,8 @@
     </div>
 </div>
 <div id="authenticated" content>
-    <p header>Contained Manager</p>
-    <p footer>Manage files here.</p>
+    <p style="font-size: 5vh;">Contained Manager</p>
+    <p style="font-size: 3vh;">Manage files here.</p>
     <div column>
         <datalist id="paths"></datalist>
         <input id="remove" placeholder="File path" list="paths"/>
