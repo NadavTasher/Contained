@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SelfContained.iml" filepath="$PROJECT_DIR$/SelfContained.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Contained.iml" filepath="$PROJECT_DIR$/Contained.iml" />
     </modules>
   </component>
 </project>
