@@ -13,7 +13,7 @@ docker run -p 80:80 --name contained-container --restart unless-stopped -d nadav
 ### Method 2: Building a docker image from source
 Install [docker](https://www.docker.com/) on your machine.
 
-[Clone the repository](https://github.com/NadavTasher/Contained/archive/master.zip) or [download the latest release](https://github.com/NadavTasher/Contained/releases/latest), enter the extracted directory, then run the following commands:
+[Clone the repository](https://github.com/NadavTasher/Contained/archive/master.zip), enter the extracted directory, then run the following commands:
 ```bash
 docker build . -t contained
 docker run -p 80:80 --name contained-container --restart unless-stopped -d contained
