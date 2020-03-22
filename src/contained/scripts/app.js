@@ -23,10 +23,11 @@ function manage_load_list() {
 }
 
 function manage_base64(file) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         let reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
+        reader.onerror = (e) => console.log(e);
     });
 }
 

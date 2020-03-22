@@ -46,7 +46,7 @@ class Manage
                             // Initialize the archive
                             $archive = new PharData($file, null, null, Phar::ZIP);
                             // Extract to contents
-                            $archive->extractTo(self::CONTENTS_DIRECTORY);
+                            $archive->extractTo(self::CONTENTS_DIRECTORY, null, true);
                             // Return a base64 representation
                             return [true, null];
                         } catch (Exception $exception) {
