@@ -41,12 +41,13 @@ class Manage
                         try {
                             // Create a temporary file name
                             $file = self::temporary(".zip");
-                            // Write file
+                            // Write base64
                             file_put_contents($file, $decoded);
-                            // Initialize the archive
-                            $archive = new PharData($file, null, null, Phar::ZIP);
-                            // Extract to contents
-                            $archive->extractTo(self::CONTENTS_DIRECTORY, null, true);
+                            // Open archive
+                            $zip = new ZipArchive();
+                            $zip->open($file);
+                            $zip->extractTo(self::CONTENTS_DIRECTORY);
+                            $zip->close();
                             // Return a base64 representation
                             return [true, null];
                         } catch (Exception $exception) {
@@ -59,10 +60,17 @@ class Manage
                     try {
                         // Create a temporary file name
                         $file = self::temporary(".zip");
-                        // Initialize the archive
-                        $archive = new PharData($file, null, null, Phar::ZIP);
-                        // Add the whole directory
-                        $archive->buildFromDirectory(self::CONTENTS_DIRECTORY);
+                        // Open archive
+                        $zip = new ZipArchive();
+                        $zip->open($file, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+                        // List files
+                        $paths = self::list();
+                        foreach ($paths as $path) {
+                            $absolutePath = self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $path;
+                            if (!is_dir($absolutePath))
+                                $zip->addFile($absolutePath, substr($path, 2));
+                        }
+                        $zip->close();
                         // Return a base64 representation
                         return [true, base64_encode(file_get_contents($file))];
                     } catch (Exception $exception) {

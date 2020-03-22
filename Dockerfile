@@ -1,5 +1,8 @@
 # Select the base image
 FROM php:7.4.1-apache
+# Install php-zip
+RUN apt-get update && apt-get install -y libzip-dev
+RUN docker-php-ext-install zip
 # Copy configurations
 COPY src/configuration/virtualhosts.conf /etc/apache2/sites-available/000-default.conf
 # Enable modifications
