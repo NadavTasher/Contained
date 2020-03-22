@@ -92,10 +92,13 @@ class Manage
         $array = self::list($relativePath);
         // Remove files
         foreach ($array as $relativePath) {
+            $absolutePath = self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $relativePath;
             if ($relativePath[strlen($relativePath) - 1] === DIRECTORY_SEPARATOR) {
-                rmdir(self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $relativePath);
+                if (realpath($absolutePath) !== realpath(self::CONTENTS_DIRECTORY)) {
+                    rmdir($absolutePath);
+                }
             } else {
-                unlink(self::CONTENTS_DIRECTORY . DIRECTORY_SEPARATOR . $relativePath);
+                unlink($absolutePath);
             }
         }
     }
