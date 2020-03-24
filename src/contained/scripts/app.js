@@ -6,7 +6,7 @@ function manage_load_list() {
     API.send("manage", "list", {}, (success, result) => {
         if (success) {
             // File list
-            let list = UI.get("paths");
+            let list = UI.find("paths");
             // Clear list
             UI.clear(list);
             // Add files
@@ -64,7 +64,7 @@ function manage_export() {
 
 function manage_remove() {
     API.send("manage", "remove", {
-        file: UI.get("remove").value
+        file: UI.find("remove").value
     }, (success, result) => {
         if (success) {
             window.location.reload();
